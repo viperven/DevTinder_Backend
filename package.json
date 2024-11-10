@@ -1,0 +1,19 @@
+{
+  "name": "dev_tinder_backend",
+  "version": "1.0.0",
+  "description": "this is a dev tinder backend with additional features",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "dev",
+    "tinder"
+  ],
+  "author": "Rupesh Jha",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.1",
+    "mongoose": "^8.8.0"
+  }
+}
