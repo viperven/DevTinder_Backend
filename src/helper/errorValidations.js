@@ -12,10 +12,14 @@ function handleDuplicateKeyError(error, next) {
     } else {
       message = "Duplicate field value entered.";
     }
-    // Pass the custom error message
-    console.log("chiga");
 
-    next(new Error(message));
+    const customError = new Error(message);
+    customError.statusCode = 400; // Bad Request
+    customError.field = field;
+    console.log(customError);
+
+    // Pass the custom error message
+    next(customError);
   } else {
     next(error); // Pass other errors to the next handler
   }

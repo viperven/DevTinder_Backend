@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema(
     },
     lastName: {
       type: String,
-      required: true,
+      // required: true,
       trim: true,
       lowercase: true,
       match: /^[a-zA-Z0-9\s]+$/,
@@ -36,19 +36,21 @@ const userSchema = new mongoose.Schema(
     },
 
     keySkills: {
+      //index is created below
       type: [String],
-      required: true,
-      validate: [
-        {
-          validator: (skills) => skills.length >= 3,
-          message: "user must have at least 3 skills",
-        },
-        {
-          validator: (skills) =>
-            skills.every((skill) => skill.length >= 2 && skill.length <= 30),
-          message: "each skill must be between 2 and 30 characters long",
-        },
-      ],
+      // required: true,
+      // validate: [
+      //   {
+      //     validator: (skills) => !skills || skills.length >= 3,
+      //     message: "user must have at least 3 skills",
+      //   },
+      //   {
+      //     validator: (skills) =>
+      //       !skills ||
+      //       skills.every((skill) => skill.length >= 2 && skill.length <= 30),
+      //     message: "each skill must be between 2 and 30 characters long",
+      //   },
+      // ],
     },
     summary: {
       type: String,
@@ -59,7 +61,7 @@ const userSchema = new mongoose.Schema(
     },
     location: {
       type: String,
-      required: true,
+      // required: true,
       validate: {
         validator: (location) =>
           validator.isLength(location, { min: 5, max: 50 }),
@@ -69,7 +71,7 @@ const userSchema = new mongoose.Schema(
     },
     age: {
       type: Number,
-      required: true,
+      // required: true,
       validate: {
         validator: (age) => age >= 15 && age <= 99,
         message: "age must be between 15 and 99",
@@ -135,13 +137,18 @@ userSchema.methods.generateAuthToken = async function () {
   );
 };
 
-// Apply this handler in your schema
+userSchema.methods.validatePassword = async function (userEnteredPassword) {
+  const user = this;
+
+  const ispasswordMatched = await bcrypt.compare(
+    userEnteredPassword,
+    user.password
+  );
+  return ispasswordMatched;
+};
+
 userSchema.post("save", function (error, doc, next) {
-  if (error.code === 11000) {
-    handleDuplicateKeyError(error, next); // Call the custom handler for duplicate key error
-  } else {
-    next(error); // For all other errors, pass them along
-  }
+  handleDuplicateKeyError(error, next);
 });
 
 const UserModel = mongoose.model("User", userSchema);
