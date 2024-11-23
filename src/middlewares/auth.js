@@ -12,8 +12,6 @@ const userAuth = async (req, res, next) => {
     }
 
     const decodeToken = await jwt.verify(token, "devTinder123");
-    console.log(decodeToken);
-
     const { id } = decodeToken;
 
     const user = await User.findById(id);

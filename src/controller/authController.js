@@ -20,13 +20,14 @@ const signUp = async (req, res) => {
     });
 
     const newUser = await user.save();
+
     const returnUserInfo = {
       name: newUser.firstName,
       id: newUser._id,
       createAt: newUser.createdAt,
     };
 
-    const token = await User.generateAuthToken();
+    const token = await newUser.generateAuthToken();
     res.cookie("token", token, {
       expires: new Date(Date.now() + 8 * 3600000),
     });

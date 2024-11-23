@@ -2,7 +2,7 @@ const validator = require("validator");
 
 //signup validation
 
-const validateSignUpData = (req, res) => {
+const validateSignUpData = (req) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -27,7 +27,7 @@ const validateSignUpData = (req, res) => {
   }
 };
 
-const validateLoginData = (req, res) => {
+const validateLoginData = (req) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -38,6 +38,10 @@ const validateLoginData = (req, res) => {
     throw new Error("Invalid email address.");
   }
 };
+
+// const validateEditData = (req) =>{
+//  const {first}
+// }
 
 module.exports = {
   validateSignUpData,

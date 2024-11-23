@@ -104,7 +104,7 @@ const userSchema = new mongoose.Schema(
     },
     photoUrl: {
       type: String,
-      default: "https://via.placeholder.com/150",
+      default: "https://geographyandyou.com/images/user-profile.png",
       validate: {
         validator: (url) => validator.isURL(url),
         message: "Invalid URL",
