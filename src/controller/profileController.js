@@ -63,7 +63,6 @@ const edit = async (req, res) => {
       location: location,
       age: age,
       photoUrl: photoUrl,
-      simba: "chiku poku",
     };
 
     const updatedUser = await User.findByIdAndUpdate(

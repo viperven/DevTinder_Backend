@@ -20,7 +20,7 @@ const send = async (req, res) => {
     const senderID = new mongoose.Types.ObjectId(user._id);
     const receiverIDMongodbId = new mongoose.Types.ObjectId(receiverID);
 
-    // Check if receiver exists
+    // Check if receiver id  exists
     const receiverIdExists = await User.findById(receiverIDMongodbId);
     if (!receiverIdExists) {
       return res.status(401).json({
@@ -78,14 +78,11 @@ const send = async (req, res) => {
 // in this contoller i can accept or ignore incoming request
 const review = async (req, res) => {
   try {
-    // auth is there so i can get logged on user id
-    // means receiver user id
-    // check sender id is valid mongoose id
-    // fetch request from connection collection where
-    // receiver user id matchs which logged user id with status intrested .
-    // request not found send back
-    // if request found of many users change status to accepted or ignored with sender id
-    // i cannot accept mine request
+    // from auth get logged in user
+    // receiverid should match with loggedin user with status intrested
+    // if found change status to ignored,accepted
+    // i cannot ignore,accept my own account
+    //validations
 
     const user = req.user;
     const { senderID, status } = req.params;
@@ -98,9 +95,10 @@ const review = async (req, res) => {
         .status(401)
         .json({ isSuccess: false, message: `status : ${status} is invalid ` });
     }
+
     const fetchConnectionRequest = await connectionRequest
-      .find({
-        $and: [{ receiverID: receiverID }, { status: "interested" }],
+      .findOne({
+        $and: [{ senderID: senderID }, { status: "interested" }],
       })
       .select("status createdAt updatedAt receiverID") // Limit fields in `connectionRequest`
       .populate(
@@ -115,34 +113,23 @@ const review = async (req, res) => {
       });
     }
 
-    console.log(fetchConnectionRequest);
-
-    const senderExistsConnectionRequest = fetchConnectionRequest.filter(
-      (cur) => cur.senderID._id.toString() == senderID
-    );
-
-    if (
-      !senderExistsConnectionRequest ||
-      senderExistsConnectionRequest.length === 0
-    ) {
-      return res.status(401).json({
-        isSuccess: false,
-        message: "requested connection user not found !",
-      });
-    }
-    console.log(senderExistsConnectionRequest);
-
-    const changeConnectionStatus = await connectionRequest.findByIdAndUpdate(
-      senderExistsConnectionRequest[0]._id,
-      { status: status }
-    );
-
-    console.log(changeConnectionStatus);
+    const changeConnectionStatus = await connectionRequest
+      .findByIdAndUpdate(
+        fetchConnectionRequest._id,
+        { status: status },
+        { returnDocument: "after" }
+      )
+      .select("status createdAt updatedAt receiverID") // Limit fields in `connectionRequest`
+      .populate(
+        "senderID",
+        "_id firstName lastName keySkills photoUrl summary gender"
+      )
+      .populate("receiverID", "_id firstName r");
 
     res.status(200).json({
       isSuccess: true,
       message: "connection request send sucessfully",
-      apiData: fetchConnectionRequest,
+      apiData: changeConnectionStatus,
     });
   } catch (err) {
     console.log(err);
