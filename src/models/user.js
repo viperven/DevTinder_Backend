@@ -30,7 +30,8 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       enum: {
         values: ["male", "female", "others"],
-        message: () => `mention ${this.path} value is not allowed`,
+        message: (props) =>
+          `mention ${props.value} value is not allowed choose from male, female or others `,
       },
       index: true,
     },
@@ -64,8 +65,8 @@ const userSchema = new mongoose.Schema(
       // required: true,
       validate: {
         validator: (location) =>
-          validator.isLength(location, { min: 5, max: 50 }),
-        message: "location must be between 5 and 50 characters long",
+          validator.isLength(location, { min: 3, max: 50 }),
+        message: "location must be between 3 and 50 characters long",
       },
       index: true,
     },
@@ -79,12 +80,7 @@ const userSchema = new mongoose.Schema(
     },
     emailId: {
       type: String,
-      required: [
-        true,
-        () => {
-          throw new Error("Cannot send connection request to yourself!");
-        },
-      ],
+      required: true,
       unique: true,
       lowercase: true,
       validate: [validator.isEmail, "Invalid email address"],
@@ -96,11 +92,11 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      minlength: [8, "password must be at least 8 characters long"],
-      validate: [
-        (password) => /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/.test(password),
-        "password must contain at least one uppercase letter, one lowercase letter, and one number",
-      ],
+      // minlength: [8, "password must be at least 8 characters long"],
+      // validate: [
+      //   (password) => /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/.test(password),
+      //   "password must contain at least one uppercase letter, one lowercase letter, and one number",
+      // ],
     },
     photoUrl: {
       type: String,

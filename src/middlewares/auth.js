@@ -27,7 +27,10 @@ const userAuth = async (req, res, next) => {
     console.log(err.message);
     res
       .status(400)
-      .json({ isSuccess: false, message: "ERROR: " + err.message });
+      .json({
+        isSuccess: false,
+        message: "please login ! token expired: " + err.message,
+      });
   }
 };
 

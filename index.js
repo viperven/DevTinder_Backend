@@ -11,6 +11,8 @@ app.use(cookieParser()); //parse cookies
 // app.use("/user", require("./src/routes/authRoutes"));
 app.use("/auth", require("./src/routes/authRoutes"));
 app.use("/profile", require("./src/routes/profileRoutes"));
+app.use("/request", require("./src/routes/connectionRoutes"));
+app.use("/user", require("./src/routes/userRotutes"));
 
 //first connect to db then start listening to api calls
 connectDB()

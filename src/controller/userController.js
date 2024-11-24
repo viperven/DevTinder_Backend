@@ -1,49 +1,89 @@
-//user controller.js
-
+const mongoose = require("mongoose");
 const User = require("../models/user");
+const Connection = require("../models/connection");
 
-const createNewUser = async (req, res) => {
+//all request conections recceived
+const received = async (req, res) => {
   try {
-    const {
-      firstName,
-      lastName,
-      gender,
-      keySkills,
-      summary,
-      location,
-      age,
-      emailId,
-      password,
-      photoUrl,
-    } = req.body;
+    const user = req.user;
+    const receiverID = new mongoose.Types.ObjectId(user._id);
 
-    const user = new User({
-      firstName,
-      lastName,
-      gender,
-      keySkills,
-      summary,
-      location,
-      age,
-      emailId,
-      password,
-      photoUrl,
+    const findAllConnections = await Connection.find({
+      receiverID: receiverID,
+      status: "interested",
+    })
+      .select("status createdAt updatedAt receiverID") // Limit fields in `connectionRequest`
+      .populate(
+        "senderID",
+        "_id firstName lastName keySkills photoUrl summary gender"
+      );
+
+    res.status(200).json({
+      isSuccess: true,
+      message: "connections fetched sucessfully",
+      apiData: findAllConnections,
     });
-
-    const savedUser = await user.save();
-    const token = await savedUser.generateAuthToken();
-
-    res.cookie("token", token, {
-      expires: new Date(Date.now() + 8 * 3600000),
-    });
-
-    res
-      .status(200)
-      .json({ message: "User Added successfully!", data: savedUser });
   } catch (err) {
-    console.log("err", err.message);
-    res.status(400).json({ isSucess: false, message: err.message });
+    console.log(err);
+
+    if (err.statusCode === 400) {
+      return res.status(err.statusCode).json({
+        isSuccess: false,
+        message: err.message,
+        field: err.field, // Optionally include the problematic field
+      });
+    }
+
+    res.status(500).json({
+      isSuccess: false,
+      message: "Server error. Please try again later.",
+    });
   }
 };
 
-module.exports = { createNewUser };
+//all my connections
+const connections = async (req, res) => {
+  try {
+    const user = req.user;
+    const logedInUser = new mongoose.Types.ObjectId(user._id);
+
+    const findAllConnections = await Connection.find({
+      $or: [
+        { senderID: logedInUser, status: "accepted" },
+        { receiverID: logedInUser, status: "accepted" },
+      ],
+    })
+      .select("status createdAt updatedAt receiverID") // Limit fields in `connectionRequest`
+      .populate("senderID", "_id firstName lastName")
+      .populate(
+        "receiverID",
+        "_id firstName lastName keySkills photoUrl summary gender"
+      );
+
+    res.status(200).json({
+      isSuccess: true,
+      message: "connections fetched sucessfully",
+      apiData: findAllConnections,
+    });
+  } catch (err) {
+    console.log(err);
+
+    if (err.statusCode === 400) {
+      return res.status(err.statusCode).json({
+        isSuccess: false,
+        message: err.message,
+        field: err.field, // Optionally include the problematic field
+      });
+    }
+
+    res.status(500).json({
+      isSuccess: false,
+      message: "Server error. Please try again later.",
+    });
+  }
+};
+
+module.exports = {
+  received,
+  connections,
+};

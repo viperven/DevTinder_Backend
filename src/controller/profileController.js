@@ -69,9 +69,9 @@ const edit = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       user._id,
       allowedFeildsToEdit,
-      { runValidators: true }
+      { runValidators: true },
+      { returnDocument: "after" }
     );
-    console.log(updatedUser);
 
     res.status(200).json({
       isSuccess: true,
@@ -79,7 +79,7 @@ const edit = async (req, res) => {
       apiData: updatedUser,
     });
   } catch (err) {
-    console.log(err.message);
+    console.log(err);
 
     if (err.statusCode === 400) {
       return res.status(err.statusCode).json({
