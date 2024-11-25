@@ -89,7 +89,7 @@ const review = async (req, res) => {
 
     const receiverID = new mongoose.Types.ObjectId(user._id);
 
-    const allowedStatus = ["accepeted", "ignored"];
+    const allowedStatus = ["accepted", "ignored"];
     if (!allowedStatus.includes(status)) {
       return res
         .status(401)
