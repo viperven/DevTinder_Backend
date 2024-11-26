@@ -100,7 +100,6 @@ const feed = async (req, res) => {
     //key skills of logged in user as i have set indexed on key skill
 
     const user = req.user;
-    console.log("user", user);
 
     const loggedInUser = new mongoose.Types.ObjectId(user._id);
 
@@ -123,7 +122,7 @@ const feed = async (req, res) => {
       $and: [
         { _id: { $nin: [...requestUniqueIds] } },
         { _id: { $ne: loggedInUser } },
-        { keySkills: { $in: user.keySkills } || [] },
+        // { keySkills: { $in: user.keySkills } || [] }, uncooment to check key skills also
       ],
     })
       .select("firstName lastName keySkills photoUrl summary gender age")
@@ -144,8 +143,40 @@ const feed = async (req, res) => {
   }
 };
 
+//get all ignored list
+const ignore = async (req, res) => {
+  try {
+    const user = req.user;
+    const loggedInUser = new mongoose.Types.ObjectId(user._id);
+
+    const listOfIgnoredUser = await Connection.find({
+      receiverID: loggedInUser,
+      status: "ignored",
+    })
+      .select("_id status createdAt updatedAt senderID receiverID")
+      .populate(
+        "senderID",
+        "_id firstName lastName keySkills photoUrl summary gender"
+      )
+      .populate("receiverID", "_id firstName lastName")
+      .lean();
+
+    res.status(200).json({
+      isSuccess: true,
+      message: "user list fetched sucessfully",
+      apiData: listOfIgnoredUser,
+    });
+  } catch (err) {
+    console.log(err?.message);
+    res
+      .status(500)
+      .json({ isSuccess: false, message: "internal server error" });
+  }
+};
+
 module.exports = {
   received,
   connections,
   feed,
+  ignore,
 };
