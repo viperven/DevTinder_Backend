@@ -1,3 +1,5 @@
+const User = require("../models/user");
+const Connection = require("../models/connection");
 const validator = require("validator");
 
 //signup validation
@@ -64,12 +66,36 @@ const validateOtpData = (req) => {
   // }
 };
 
-// const validateSendMessageData = (req) =>{
+const validateSendMessageData = async (req) => {
+  const user = req.user;
+  const senderID = new mongoose.Types.ObjectId(user._id);
+  const { receiverID } = req.body;
 
-// }
+  if (!senderID || !receiverID) {
+    return res.status(400).json({
+      isSuccess: false,
+      message: "Sender and Receiver are required",
+    });
+  }
+
+  const isReceiverConnection = await Connection.findOne({
+    $or: [
+      { senderID: senderID, receiverID: receiverID, status: "accepted" },
+      { senderID: receiverID, receiverID: senderID, status: "accepted" },
+    ],
+  });
+
+  if (!isReceiverConnection) {
+    return res.status(400).json({
+      isSuccess: false,
+      message: "Receiver does not exist or is not your connection.",
+    });
+  }
+};
 
 module.exports = {
   validateSignUpData,
   validateLoginData,
   validateOtpData,
+  validateSendMessageData,
 };
