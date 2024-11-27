@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+require('dotenv').config();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const handleDuplicateKeyError = require("../helper/errorValidations");
@@ -128,7 +129,7 @@ userSchema.methods.generateAuthToken = async function () {
       firstName: this.firstName,
       lastName: this.lastName,
     },
-    "devTinder123",
+    process.env.jwtSecret,
     { expiresIn: "2h" }
   );
 };

@@ -64,6 +64,10 @@ const validateOtpData = (req) => {
   // }
 };
 
+// const validateSendMessageData = (req) =>{
+
+// }
+
 module.exports = {
   validateSignUpData,
   validateLoginData,

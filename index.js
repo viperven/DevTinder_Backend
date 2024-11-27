@@ -13,6 +13,7 @@ app.use("/auth", require("./src/routes/authRoutes"));
 app.use("/profile", require("./src/routes/profileRoutes"));
 app.use("/request", require("./src/routes/connectionRoutes"));
 app.use("/user", require("./src/routes/userRotutes"));
+app.use("/message", require("./src/routes/messageRoute"));
 
 //first connect to db then start listening to api calls
 connectDB()
