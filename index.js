@@ -8,7 +8,6 @@ app.use(cookieParser()); //parse cookies
 
 //all Routes
 
-// app.use("/user", require("./src/routes/authRoutes"));
 app.use("/auth", require("./src/routes/authRoutes"));
 app.use("/profile", require("./src/routes/profileRoutes"));
 app.use("/request", require("./src/routes/connectionRoutes"));

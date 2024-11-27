@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
-require('dotenv').config();
+require("dotenv").config();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const handleDuplicateKeyError = require("../helper/errorValidations");
