@@ -2,9 +2,18 @@ const express = require("express");
 const connectDB = require("./src/config/db");
 const app = express();
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 
 app.use(express.json()); //parse json bodies
 app.use(cookieParser()); //parse cookies
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Replace with your allowed domain
+    methods: ["GET", "POST", "PUT"], // Allowed methods
+    credentials: true,
+    // For legacy browser support
+  })
+);
 
 //all Routes
 

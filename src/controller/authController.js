@@ -92,7 +92,6 @@ const login = async (req, res) => {
     res.status(200).json({
       isSuccess: true,
       message: "logged in sucessfulyy",
-      apiData: userExists,
     });
   } catch (err) {
     console.log(err.message);
