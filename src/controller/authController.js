@@ -34,12 +34,12 @@ const signUp = async (req, res) => {
     };
 
     const token = await newUser.generateAuthToken();
-    res.cookie("token", token, {
+    res.cookie("auth-token", token, {
       expires: new Date(Date.now() + 8 * 3600000),
     });
 
     return res.status(200).json({
-      isSucess: true,
+      isSuccess: true,
       message: "user created sucessfully",
       apiData: returnUserInfo,
     });
@@ -85,13 +85,26 @@ const login = async (req, res) => {
     }
 
     const token = await userExists.generateAuthToken();
-    res.cookie("token", token, {
+    res.cookie("auth-token", token, {
       expires: new Date(Date.now() + 8 * 3600000),
     });
+
+    const safeData = {
+      firstName: userExists.firstName,
+      lastName: userExists.lastName,
+      gender: userExists.gender,
+      keySkills: userExists.keySkills,
+      summary: userExists.summary,
+      location: userExists.location,
+      age: userExists.age,
+      photoUrl: userExists.photoUrl,
+      emailID: userExists.emailID,
+    };
 
     res.status(200).json({
       isSuccess: true,
       message: "logged in sucessfulyy",
+      apiData: safeData,
     });
   } catch (err) {
     console.log(err.message);
