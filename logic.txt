@@ -1,0 +1,11 @@
+api to delete user 
+
+case 1 : user presnet only in user table
+soln   :    directly delete user from user table
+
+case 2 : request exist in connection table ex [i have send frnd request, got frnd request ,  for any thing my id should exist in collection table]
+soln   : delete all documents in which id of user exists in sender or receiver
+
+case 3 : user has conversation store in conversation table and in message table
+soln   : delete all documents in conversation table which matches with sender or receiver id and also delete same in message table
+

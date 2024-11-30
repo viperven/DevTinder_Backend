@@ -1,9 +1,10 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
-require("dotenv").config();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const handleDuplicateKeyError = require("../helper/errorValidations");
+require("dotenv").config();
+
 
 const userSchema = new mongoose.Schema(
   {
@@ -112,7 +113,6 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
 userSchema.index({ keySkills: 1 }); // Creates a multikey index for array field
 
 userSchema.pre("save", async function (next) {
@@ -144,9 +144,14 @@ userSchema.methods.validatePassword = async function (userEnteredPassword) {
   return ispasswordMatched;
 };
 
+
 userSchema.post("save", function (error, doc, next) {
   handleDuplicateKeyError(error, next);
 });
+
+
+
+
 
 const UserModel = mongoose.model("User", userSchema);
 

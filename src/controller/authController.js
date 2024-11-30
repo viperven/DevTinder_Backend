@@ -12,6 +12,10 @@ const {
   checkOtpExpire,
 } = require("../helper/commonFunction");
 
+const Connection = require("../models/connection");
+const Conversation = require("../models/conversations");
+const Message = require("../models/message");
+
 const signUp = async (req, res) => {
   try {
     validateSignUpData(req, res); //validating request
@@ -34,7 +38,7 @@ const signUp = async (req, res) => {
     };
 
     const token = await newUser.generateAuthToken();
-    res.cookie("auth-token", token, {
+    res.cookie("token", token, {
       expires: new Date(Date.now() + 8 * 3600000),
     });
 
@@ -85,7 +89,8 @@ const login = async (req, res) => {
     }
 
     const token = await userExists.generateAuthToken();
-    res.cookie("auth-token", token, {
+
+    res.cookie("token", token, {
       expires: new Date(Date.now() + 8 * 3600000),
     });
 
@@ -217,4 +222,43 @@ const forgetPassword = async (req, res) => {
   }
 };
 
-module.exports = { signUp, login, logout, forgetPassword };
+const deleteUser = async (req, res) => {
+  try {
+    const userId = req.user._id; // Already validated in middleware
+    const user = await User.findById(userId); // Ensure it's a Mongoose document
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ isSuccess: false, message: "User not found!" });
+    }
+
+    // Manually trigger cascade deletions
+    await Promise.all([
+      Connection.deleteMany({ $or: [{ senderID: userId }, { receiverID: userId }] }),
+      Message.deleteMany({ $or: [{ senderID: userId }, { receiverID: userId }] }),
+      Conversation.deleteMany({ $or: [{ senderID: userId }, { receiverID: userId }] }),
+      User.deleteOne({_id:userId})
+    ]);
+
+    res.status(200).json({ isSuccess: true, message: "User deleted successfully" });
+  }
+  catch (err) {
+    console.log(err?.message);
+
+    if (err.statusCode === 400) {
+      return res.status(err.statusCode).json({
+        isSuccess: false,
+        message: err.message,
+        field: err.field, // Optionally include the problematic field
+      });
+    }
+
+    res.status(500).json({
+      isSuccess: false,
+      message: "Server error. Please try again later.",
+    });
+  }
+}
+
+module.exports = { signUp, login, logout, forgetPassword, deleteUser };
