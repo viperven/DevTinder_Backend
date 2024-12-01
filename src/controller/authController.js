@@ -235,15 +235,22 @@ const deleteUser = async (req, res) => {
 
     // Manually trigger cascade deletions
     await Promise.all([
-      Connection.deleteMany({ $or: [{ senderID: userId }, { receiverID: userId }] }),
-      Message.deleteMany({ $or: [{ senderID: userId }, { receiverID: userId }] }),
-      Conversation.deleteMany({ $or: [{ senderID: userId }, { receiverID: userId }] }),
-      User.deleteOne({_id:userId})
+      Connection.deleteMany({
+        $or: [{ senderID: userId }, { receiverID: userId }],
+      }),
+      Message.deleteMany({
+        $or: [{ senderID: userId }, { receiverID: userId }],
+      }),
+      Conversation.deleteMany({
+        $or: [{ senderID: userId }, { receiverID: userId }],
+      }),
+      User.deleteOne({ _id: userId }),
     ]);
 
-    res.status(200).json({ isSuccess: true, message: "User deleted successfully" });
-  }
-  catch (err) {
+    res
+      .status(200)
+      .json({ isSuccess: true, message: "User deleted successfully" });
+  } catch (err) {
     console.log(err?.message);
 
     if (err.statusCode === 400) {
@@ -259,6 +266,6 @@ const deleteUser = async (req, res) => {
       message: "Server error. Please try again later.",
     });
   }
-}
+};
 
 module.exports = { signUp, login, logout, forgetPassword, deleteUser };
