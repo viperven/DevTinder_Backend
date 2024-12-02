@@ -9,7 +9,7 @@ app.use(cookieParser()); //parse cookies
 app.use(
   cors({
     origin: "http://localhost:5173", // Replace with your allowed domain
-    methods: ["GET", "POST", "PUT"], // Allowed methods
+    methods: ["GET", "POST", "PUT", "PATCH"], // Allowed methods
     credentials: true,
     // For legacy browser support
   })
