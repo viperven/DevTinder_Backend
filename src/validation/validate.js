@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const Connection = require("../models/connection");
 const validator = require("validator");
+const mongoose = require("mongoose");
 
 //signup validation
 
