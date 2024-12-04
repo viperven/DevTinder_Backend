@@ -113,6 +113,7 @@ const login = async (req, res) => {
     });
   } catch (err) {
     console.log(err.message);
+    console.log(err.statusCode);
 
     if (err.statusCode === 400) {
       return res.status(err.statusCode).json({

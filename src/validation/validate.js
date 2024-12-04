@@ -34,11 +34,15 @@ const validateLoginData = (req) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    throw new Error("Please provide both email and password!");
+    const customError = new Error("Please provide both email and password!");
+    customError.statusCode = 400; // Bad Request
+    throw customError;
   }
 
   if (!validator.isEmail(email)) {
-    throw new Error("Invalid email address.");
+    const customError = new Error("Invalid email address.");
+    customError.statusCode = 400; // Bad Request
+    throw customError;
   }
 };
 

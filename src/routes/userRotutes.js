@@ -10,7 +10,7 @@ const {
   ignore,
 } = require("../controller/userController");
 
-router.post("/received", userAuth, received);
+router.get("/received", userAuth, received);
 router.post("/connections", userAuth, connections);
 router.get("/feed", userAuth, feed);
 router.get("/ignore", userAuth, ignore);
