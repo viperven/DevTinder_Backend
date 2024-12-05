@@ -158,7 +158,7 @@ const ignore = async (req, res) => {
         "senderID",
         "_id firstName lastName keySkills photoUrl summary gender"
       )
-      .populate("receiverID", "_id firstName lastName")
+      .populate("receiverID", "_id firstName lastName keySkills photoUrl summary gender")
       .lean();
 
     res.status(200).json({
