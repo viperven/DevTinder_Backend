@@ -95,6 +95,7 @@ const login = async (req, res) => {
     });
 
     const safeData = {
+      id:userExists._id,
       firstName: userExists.firstName,
       lastName: userExists.lastName,
       gender: userExists.gender,
@@ -112,8 +113,6 @@ const login = async (req, res) => {
       apiData: safeData,
     });
   } catch (err) {
-    console.log(err.message);
-    console.log(err.statusCode);
 
     if (err.statusCode === 400) {
       return res.status(err.statusCode).json({

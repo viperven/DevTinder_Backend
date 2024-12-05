@@ -11,7 +11,7 @@ const {
 } = require("../controller/userController");
 
 router.get("/received", userAuth, received);
-router.post("/connections", userAuth, connections);
+router.get("/connections", userAuth, connections);
 router.get("/feed", userAuth, feed);
 router.get("/ignore", userAuth, ignore);
 

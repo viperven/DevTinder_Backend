@@ -78,12 +78,6 @@ const send = async (req, res) => {
 // in this contoller i can accept or ignore incoming request
 const review = async (req, res) => {
   try {
-    // from auth get logged in user
-    // receiverid should match with loggedin user with status intrested
-    // if found change status to ignored,accepted
-    // i cannot ignore,accept my own account
-    //validations
-
     const user = req.user;
     const { senderID, status } = req.params;
 
