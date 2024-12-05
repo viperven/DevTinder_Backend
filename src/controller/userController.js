@@ -60,19 +60,6 @@ const connections = async (req, res) => {
         "_id firstName lastName keySkills photoUrl summary gender"
       );
 
-     
-      console.log( String(findAllConnections[0].receiverID._id) , String(logedInUser));
-      console.log( String(findAllConnections[0].receiverID._id) === String(logedInUser));
-      
-
-    const filteredConnections = findAllConnections.filter(
-      (connection) =>
-        String(connection.senderID._id) !== String(logedInUser) &&
-        String(connection.receiverID._id) !== String(logedInUser)
-    );
-
-    console.log(filteredConnections);
-
     res.status(200).json({
       isSuccess: true,
       message: "connections fetched sucessfully",
