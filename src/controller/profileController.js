@@ -6,6 +6,7 @@ const view = async (req, res) => {
 
     const allowedUserObject = {
       _id: user?._id,
+      emailId: user?.emailId,
       firstName: user?.firstName,
       lastName: user?.lastName,
       gender: user?.gender,
