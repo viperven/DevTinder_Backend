@@ -6,7 +6,7 @@ const { validateSendMessageData } = require("../validation/validate");
 //send message to connection only
 const sendMessage = async (req, res) => {
   try {
-    validateSendMessageData(req);
+   await validateSendMessageData(req);
 
     const user = req.user;
     const senderID = new mongoose.Types.ObjectId(user._id);
@@ -45,10 +45,18 @@ const sendMessage = async (req, res) => {
       data: message,
     });
   } catch (err) {
-    console.error(err.message);
-    res
-      .status(500)
-      .json({ isSuccess: false, message: "Internal server error" });
+    console.error(err.message, "sss");
+    if (err.statusCode === 400) {
+      return res.status(err.statusCode).json({
+        isSuccess: false,
+        message: err.message,
+        field: err.field, // Optionally include the problematic field
+      });
+    }
+    return res.status(err.statusCode || 500).json({
+      isSuccess: false,
+      message: err.message || "Internal server error",
+    });
   }
 };
 
@@ -61,8 +69,8 @@ const getConversations = async (req, res) => {
     const conversations = await Conversation.find({
       $or: [{ senderID: loggedInUser }, { receiverID: loggedInUser }],
     })
-      .populate("senderID", "firstName lastName summary age gender")
-      .populate("receiverID", "firstName lastName summary age gender")
+      .populate("senderID", "firstName lastName summary age gender photoUrl")
+      .populate("receiverID", "firstName lastName summary age gender photoUrl")
       .populate("lastMessage", "content media mediaType")
       .sort({ updatedAt: -1 });
 

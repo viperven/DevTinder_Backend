@@ -95,7 +95,7 @@ const login = async (req, res) => {
     });
 
     const safeData = {
-      id:userExists._id,
+      id: userExists._id,
       firstName: userExists.firstName,
       lastName: userExists.lastName,
       gender: userExists.gender,
@@ -169,7 +169,6 @@ const forgetPassword = async (req, res) => {
         { upsert: true }
       );
       //code to send otp on mail in async way
-
       return res
         .status(200)
         .json({ isSuccess: true, message: "otp sended sucessfully" });
@@ -177,7 +176,7 @@ const forgetPassword = async (req, res) => {
 
     if (step == 1) {
       const isUserOtpExists = await OTP.findOne({ emailId: emailId });
-      const isOtpExpired = checkOtpExpire(isUserOtpExists?.createdAt);
+      const isOtpExpired = checkOtpExpire(isUserOtpExists?.updatedAt);
 
       if (!isUserOtpExists || isOtpExpired) {
         return res.status(401).json({

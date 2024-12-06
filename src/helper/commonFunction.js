@@ -11,8 +11,9 @@ const checkOtpExpire = (dateString) => {
   const givenTime = new Date(dateString.toString());
   const tenMinutesLater = new Date(givenTime.getTime() + 10 * 60 * 1000); // 10 minutes
   const currentTime = new Date();
+  console.log(currentTime > tenMinutesLater);
 
   return currentTime > tenMinutesLater; // true if OTP is still valid
 };
 
-module.exports= { generateRandomNumber, checkOtpExpire };
+module.exports = { generateRandomNumber, checkOtpExpire };

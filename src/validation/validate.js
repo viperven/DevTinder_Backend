@@ -30,7 +30,7 @@ const validateSignUpData = (req) => {
   // }
 };
 
-const validateLoginData = (req) => {
+const validateLoginData = (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -71,16 +71,15 @@ const validateOtpData = (req) => {
   // }
 };
 
-const validateSendMessageData = async (req) => {
+const validateSendMessageData = async (req, res) => {
   const user = req.user;
   const senderID = new mongoose.Types.ObjectId(user._id);
   const { receiverID } = req.body;
 
   if (!senderID || !receiverID) {
-    return res.status(400).json({
-      isSuccess: false,
-      message: "Sender and Receiver are required",
-    });
+    const customError = new Error("Sender and Receiver are required !");
+    customError.statusCode = 400; // Bad Request
+    throw customError;
   }
 
   const isReceiverConnection = await Connection.findOne({
@@ -91,10 +90,9 @@ const validateSendMessageData = async (req) => {
   });
 
   if (!isReceiverConnection) {
-    return res.status(400).json({
-      isSuccess: false,
-      message: "Receiver does not exist or is not your connection.",
-    });
+    const customError = new Error("Receiver does not exist or is not your connection !");
+    customError.statusCode = 400; // Bad Request
+    throw customError;
   }
 };
 
