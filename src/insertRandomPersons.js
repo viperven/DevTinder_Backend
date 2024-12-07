@@ -1,5 +1,5 @@
 const User = require("./models/user");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const { faker } = require("@faker-js/faker");
 
 app.get("/insert", async (req, res) => {

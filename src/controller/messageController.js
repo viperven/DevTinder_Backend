@@ -11,7 +11,7 @@ const sendMessage = async (req, res) => {
     const user = req.user;
     const senderID = new mongoose.Types.ObjectId(user._id);
     const { receiverID, content, media, mediaType } = req.body;
-    const io = req.app.get("io"); // Access the global `io` instance
+    // const io = req.app.get("io"); // Access the global `io` instance
 
     // Find or create a conversation
     let conversation = await Conversation.findOne({

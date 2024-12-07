@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const bcrypt = require("bcryptjs");
 
 //otp is only sent on email for now
 const otpSchema = new mongoose.Schema(
