@@ -6,7 +6,7 @@ const { validateSendMessageData } = require("../validation/validate");
 //send message to connection only
 const sendMessage = async (req, res) => {
   try {
-   await validateSendMessageData(req);
+    await validateSendMessageData(req);
 
     const user = req.user;
     const senderID = new mongoose.Types.ObjectId(user._id);
@@ -113,7 +113,16 @@ const fetchAllMessages = async (req, res) => {
 
     const allConversations = await Message.find({
       conversationID: conversationID,
-    }).sort({ timestamp: 1 });
+    })
+      .populate(
+        "senderID",
+        "firstName lastName summary age gender photoUrl createdAt"
+      )
+      .populate(
+        "receiverID",
+        "firstName lastName summary age gender photoUrl createdAt"
+      )
+      .sort({ timestamp: 1 });
 
     res.status(200).send({
       isSuccess: true,
