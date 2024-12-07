@@ -11,6 +11,7 @@ const sendMessage = async (req, res) => {
     const user = req.user;
     const senderID = new mongoose.Types.ObjectId(user._id);
     const { receiverID, content, media, mediaType } = req.body;
+    const io = req.app.get("io"); // Access the global `io` instance
 
     // Find or create a conversation
     let conversation = await Conversation.findOne({
@@ -39,10 +40,15 @@ const sendMessage = async (req, res) => {
     conversation.lastMessage = message._id;
     await conversation.save();
 
+    // Populate sender and receiver details for the message
+    const populatedMessage = await Message.findById(message._id)
+      .populate("senderID", "firstName lastName summary age gender photoUrl createdAt") // Select only the required fields
+      .populate("receiverID", "firstName lastName summary age gender photoUrl createdAt");
+
     return res.status(200).json({
       isSuccess: true,
       message: "Message sent successfully",
-      data: message,
+      data: populatedMessage,
     });
   } catch (err) {
     console.error(err.message, "sss");
