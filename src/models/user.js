@@ -5,7 +5,6 @@ const jwt = require("jsonwebtoken");
 const handleDuplicateKeyError = require("../helper/errorValidations");
 require("dotenv").config();
 
-
 const userSchema = new mongoose.Schema(
   {
     firstName: {
@@ -130,7 +129,7 @@ userSchema.methods.generateAuthToken = async function () {
       lastName: this.lastName,
     },
     process.env.jwtSecret,
-    { expiresIn: "2h" }
+    { expiresIn: "1d" }
   );
 };
 
@@ -144,14 +143,9 @@ userSchema.methods.validatePassword = async function (userEnteredPassword) {
   return ispasswordMatched;
 };
 
-
 userSchema.post("save", function (error, doc, next) {
   handleDuplicateKeyError(error, next);
 });
-
-
-
-
 
 const UserModel = mongoose.model("User", userSchema);
 
