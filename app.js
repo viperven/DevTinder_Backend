@@ -12,7 +12,11 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "http://localhost:5173"],
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:5173",
+      "https://mydevtinder.netlify.app",
+    ],
     methods: ["GET", "POST"],
   },
 });
@@ -21,7 +25,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://mydevtinder.netlify.app"],
     methods: ["GET", "POST", "PUT", "PATCH"],
     credentials: true,
   })
@@ -47,7 +51,6 @@ connectDB()
     console.log("database connection error", err);
   });
 
-
 // Socket.IO configuration
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
@@ -65,8 +68,6 @@ io.on("connection", (socket) => {
   });
 });
 
-
-
 // This handler function will be invoked by AWS Lambda
 // module.exports.handler = async (event, context) => {
 //   try {
@@ -81,7 +82,6 @@ io.on("connection", (socket) => {
 //       .catch((err) => {
 //         console.log("database connection error", err);
 //       });
-
 
 //     // Socket.IO configuration
 //     io.on("connection", (socket) => {

@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:5173","https://dainty-fox-418827.netlify.app"],
+    origin: ["http://localhost:5173", "https://mydevtinder.netlify.app"],
     methods: ["GET", "POST", "PUT", "PATCH"],
     credentials: true,
   })
@@ -45,7 +45,6 @@ app.use("/message", require("./src/routes/messageRoute"));
 //     console.log("database connection error", err);
 //   });
 
-
 //   // Socket.IO configuration
 // io.on("connection", (socket) => {
 //   console.log("A user connected:", socket.id);
@@ -63,8 +62,6 @@ app.use("/message", require("./src/routes/messageRoute"));
 //   });
 // });
 
-
-
 // This handler function will be invoked by AWS Lambda
 
 module.exports.handler = async (event, context) => {
@@ -79,7 +76,6 @@ module.exports.handler = async (event, context) => {
       .catch((err) => {
         console.log("database connection error", err);
       });
-
 
     // Now, you can continue with your regular logic
     return serverless(app)(event, context);
