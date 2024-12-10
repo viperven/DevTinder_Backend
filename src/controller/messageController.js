@@ -1,7 +1,7 @@
 const Conversation = require("../models/conversations");
 const Message = require("../models/message");
 const mongoose = require("mongoose");
-const { validateSendMessageData } = require("../validation/validate");
+const { validateSendMessageData, validateGetAllMessageById } = require("../validation/validate");
 
 //send message to connection only
 const sendMessage = async (req, res) => {
@@ -51,7 +51,7 @@ const sendMessage = async (req, res) => {
       data: populatedMessage,
     });
   } catch (err) {
-    console.error(err.message, "sss");
+
     if (err.statusCode === 400) {
       return res.status(err.statusCode).json({
         isSuccess: false,
@@ -143,4 +143,60 @@ const fetchAllMessages = async (req, res) => {
   }
 };
 
-module.exports = { sendMessage, getConversations, fetchAllMessages };
+//fetch message by receiver id and sender id
+const getAllMessageById = async (req, res) => {
+  try {
+   await validateGetAllMessageById(req);
+    const user = req.user;
+    const { receiverId } = req.query;
+    const loggedInUser = new mongoose.Types.ObjectId(user._id);
+
+    const conversationExists = await Conversation.findOne({
+      $or: [{ senderID: loggedInUser, receiverID: receiverId }, { senderID: receiverId, receiverID: loggedInUser }]
+    })
+
+    if (!conversationExists) {
+      return res.status(404).json({
+        isSuccess: true,
+        message: "no chat found .",
+      });
+    }
+
+    const getAllMessageByConversationId = await Message.find({
+      conversationID: conversationExists?._id,
+    })
+      .populate(
+        "senderID",
+        "firstName lastName summary age gender photoUrl createdAt"
+      )
+      .populate(
+        "receiverID",
+        "firstName lastName summary age gender photoUrl createdAt"
+      )
+      .sort({ timestamp: 1 });
+
+    res.status(200).json({
+      isSuccess: true, message: "data fetched sucessfully", apiData: getAllMessageByConversationId
+    })
+
+  }
+  catch (err) {
+    console.log(err?.message);
+
+    if (err.statusCode === 400) {
+      return res.status(err.statusCode).json({
+        isSuccess: false,
+        message: err.message,
+        field: err.field,
+      });
+    }
+
+    res.status(500).json({
+      isSuccess: false,
+      message: "Server error. Please try again later.",
+    });
+
+  }
+}
+
+module.exports = { sendMessage, getConversations, fetchAllMessages, getAllMessageById };

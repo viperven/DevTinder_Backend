@@ -35,7 +35,7 @@ const validateLoginData = (req, res) => {
 
   if (!email || !password) {
     const customError = new Error("Please provide both email and password!");
-    customError.statusCode = 400; // Bad Request
+    customError.statusCode = 400; 
     throw customError;
   }
 
@@ -71,7 +71,7 @@ const validateOtpData = (req) => {
   // }
 };
 
-const validateSendMessageData = async (req, res) => {
+const validateSendMessageData = async (req) => {
   const user = req.user;
   const senderID = new mongoose.Types.ObjectId(user._id);
   const { receiverID } = req.body;
@@ -96,9 +96,34 @@ const validateSendMessageData = async (req, res) => {
   }
 };
 
+const validateGetAllMessageById = async (req) => {
+  const { receiverId } = req.query;
+
+  const user = req.user;
+  const loggedInUser = new mongoose.Types.ObjectId(user._id);
+
+  if (!receiverId || !validator.isMongoId(receiverId.toString())) {
+    const customError = new Error("Invalid mongoid not presenet or invalid.");
+    customError.statusCode = 400; 
+    throw customError;
+  }
+
+  const connectionExists = await Connection.findOne({
+    $or: [{ senderID: loggedInUser, receiverID: receiverId, status: "accepted" }, { senderID: receiverId, receiverID: loggedInUser, status: "accepted" }]
+  })
+
+  if (!connectionExists) {
+    const customError = new Error("sender and receiver must be friends.");
+    customError.statusCode = 400; 
+    throw customError;
+  }
+
+}
+
 module.exports = {
   validateSignUpData,
   validateLoginData,
   validateOtpData,
   validateSendMessageData,
+  validateGetAllMessageById
 };
