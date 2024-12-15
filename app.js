@@ -68,6 +68,10 @@ io.on("connection", (socket) => {
   });
 });
 
+app.get("/", async (req, res) => {
+  res.status(200).send("ok");
+});
+
 // This handler function will be invoked by AWS Lambda
 // module.exports.handler = async (event, context) => {
 //   try {
