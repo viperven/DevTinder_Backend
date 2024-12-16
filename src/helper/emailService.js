@@ -9,14 +9,33 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const sendSignUpMail = async (receiverMailId) => {
+const sendSignUpMail = async (receiverMailId, receiverName = "user") => {
   const mailOptions = {
     from: process.env.email_user,
     to: receiverMailId,
     subject: "Welcome to Dev Tinder Family...",
-    text: "Hi, my name is Rupesh Jha. Thank you for signing up! We are glad to have you in the Developers community.",
+    text:
+      "Hi " +
+      receiverName +
+      " my name is Rupesh Jha We are glad to have you in the Developers community. Thank you " +
+      receiverName +
+      " for signing up! ",
   };
+  try {
+    const info = transporter.sendMail(mailOptions); // No manual promise wrapping needed
+    return "Email sent: " + info.response;
+  } catch (error) {
+    throw new Error("Error occurred: " + error.message);
+  }
+};
 
+const sendOTPMail = async (receiverMailId, otp) => {
+  const mailOptions = {
+    from: process.env.email_user,
+    to: receiverMailId,
+    subject: "OTP for signup",
+    text: `Yout OTP is ${otp} and valid only for 10 minutes ... Dev Tinder`,
+  };
   try {
     const info = await transporter.sendMail(mailOptions); // No manual promise wrapping needed
     return "Email sent: " + info.response;
@@ -25,4 +44,4 @@ const sendSignUpMail = async (receiverMailId) => {
   }
 };
 
-module.exports = { sendSignUpMail };
+module.exports = { sendSignUpMail, sendOTPMail };

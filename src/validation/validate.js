@@ -6,16 +6,25 @@ const mongoose = require("mongoose");
 //signup validation
 
 const validateSignUpData = (req) => {
-  const { email, password } = req.body;
+  const { email, password, userOtp } = req.body;
 
   if (!email || !password) {
-    throw new Error("Please provide both email and password!");
+    const customError = new Error("Please provide both email and password!");
+    customError.statusCode = 400;
+    throw customError;
   }
 
   if (!validator.isEmail(email)) {
-    throw new Error("Invalid email address.");
+    const customError = new Error("Invalid email address !");
+    customError.statusCode = 400;
+    throw customError;
   }
 
+  if (!userOtp) {
+    const customError = new Error("OTP is madatory !");
+    customError.statusCode = 400;
+    throw customError;
+  }
   // if (
   //   !validator.isStrongPassword(password, {
   //     minLength: 8,
@@ -35,7 +44,7 @@ const validateLoginData = (req, res) => {
 
   if (!email || !password) {
     const customError = new Error("Please provide both email and password!");
-    customError.statusCode = 400; 
+    customError.statusCode = 400;
     throw customError;
   }
 
@@ -90,7 +99,9 @@ const validateSendMessageData = async (req) => {
   });
 
   if (!isReceiverConnection) {
-    const customError = new Error("Receiver does not exist or is not your connection !");
+    const customError = new Error(
+      "Receiver does not exist or is not your connection !"
+    );
     customError.statusCode = 400; // Bad Request
     throw customError;
   }
@@ -104,26 +115,28 @@ const validateGetAllMessageById = async (req) => {
 
   if (!receiverId || !validator.isMongoId(receiverId.toString())) {
     const customError = new Error("Invalid mongoid not presenet or invalid.");
-    customError.statusCode = 400; 
+    customError.statusCode = 400;
     throw customError;
   }
 
   const connectionExists = await Connection.findOne({
-    $or: [{ senderID: loggedInUser, receiverID: receiverId, status: "accepted" }, { senderID: receiverId, receiverID: loggedInUser, status: "accepted" }]
-  })
+    $or: [
+      { senderID: loggedInUser, receiverID: receiverId, status: "accepted" },
+      { senderID: receiverId, receiverID: loggedInUser, status: "accepted" },
+    ],
+  });
 
   if (!connectionExists) {
     const customError = new Error("sender and receiver must be friends.");
-    customError.statusCode = 400; 
+    customError.statusCode = 400;
     throw customError;
   }
-
-}
+};
 
 module.exports = {
   validateSignUpData,
   validateLoginData,
   validateOtpData,
   validateSendMessageData,
-  validateGetAllMessageById
+  validateGetAllMessageById,
 };

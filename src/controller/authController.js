@@ -10,18 +10,67 @@ const {
 const {
   generateRandomNumber,
   checkOtpExpire,
+  generateOtpAndStore,
 } = require("../helper/commonFunction");
 
 const Connection = require("../models/connection");
 const Conversation = require("../models/conversations");
 const Message = require("../models/message");
+const { sendSignUpMail, sendOTPMail } = require("../helper/emailService");
+
+const sendOtp = async (req, res) => {
+  try {
+    const { emailID } = req.body;
+
+    if (!emailID) {
+      res
+        .status(400)
+        .send({ isSuccess: false, message: "email id is required" });
+    }
+    const otp = await generateOtpAndStore(emailID);
+    await sendOTPMail(emailID, otp?.otp);
+    res.status(200).send({
+      isSuccess: true,
+      message: "OTP sent succesfully.",
+    });
+  } catch (err) {
+    console.log(err?.message);
+    if (err.statusCode === 400) {
+      return res.status(err.statusCode).json({
+        isSuccess: false,
+        message: err.message,
+        field: err.field, // Optionally include the problematic field
+      });
+    }
+
+    res.status(500).json({
+      isSuccess: false,
+      message: "Server error. Please try again later.",
+    });
+  }
+};
 
 const signUp = async (req, res) => {
   try {
     validateSignUpData(req, res); //validating request
+    const { name, email, password, userOtp } = req.body;
 
-    const { name, email, password } = req.body;
-    const exsistingUser = await User.findOne({ emailId: email });
+    const isUserOtpExists = await OTP.findOne({ emailId: email });
+    const isOtpExpired = checkOtpExpire(isUserOtpExists?.updatedAt);
+
+    if (!isUserOtpExists || isOtpExpired) {
+      return res.status(401).json({
+        isSuccess: false,
+        message: "user otp not found or expired",
+      });
+    }
+
+    if (isUserOtpExists.otp !== userOtp) {
+      return res.status(401).json({
+        isSuccess: false,
+        message: "otp mismatch",
+      });
+    }
 
     const user = new User({
       firstName: name,
@@ -41,6 +90,8 @@ const signUp = async (req, res) => {
     // res.cookie("token", token, {
     //   expires: new Date(Date.now() + 8 * 3600000),
     // });
+
+    sendSignUpMail(email, name);
 
     return res.status(200).json({
       isSuccess: true,
@@ -140,7 +191,7 @@ const logout = async (req, res) => {
   }
 };
 
-//can be used for chnage password as well
+//can be used for change password as well
 const forgetPassword = async (req, res) => {
   try {
     validateOtpData(req);
@@ -167,7 +218,7 @@ const forgetPassword = async (req, res) => {
       await OTP.findOneAndUpdate(
         { emailId: emailId },
         { otp: generateRandomNumber(4), createdAt: new Date() },
-        { upsert: true }
+        { upsert: true, new: true }
       );
       //code to send otp on mail in async way
       return res
@@ -268,4 +319,4 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { signUp, login, logout, forgetPassword, deleteUser };
+module.exports = { signUp, login, logout, forgetPassword, deleteUser, sendOtp };

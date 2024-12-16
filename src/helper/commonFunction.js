@@ -1,3 +1,5 @@
+const OTP = require("../models/otp");
+
 const generateRandomNumber = (length = 1) => {
   let num = "";
   for (let i = 0; i < length; i++) {
@@ -8,12 +10,23 @@ const generateRandomNumber = (length = 1) => {
 
 //otp is not valid after 10 minutes
 const checkOtpExpire = (dateString) => {
-  const givenTime = new Date(dateString.toString());
-  const tenMinutesLater = new Date(givenTime.getTime() + 10 * 60 * 1000); // 10 minutes
+  const givenTime = new Date(dateString?.toString());
+  const tenMinutesLater = new Date(givenTime?.getTime() + 10 * 60 * 1000); // 10 minutes
   const currentTime = new Date();
-  console.log(currentTime > tenMinutesLater);
-
   return currentTime > tenMinutesLater; // true if OTP is still valid
 };
 
-module.exports = { generateRandomNumber, checkOtpExpire };
+//generate otp with email id ans store in db
+const generateOtpAndStore = async (emailID) => {
+  if (!emailID) {
+    return "emailID is mandatory";
+  }
+  let otp = await OTP.findOneAndUpdate(
+    { emailId: emailID },
+    { otp: generateRandomNumber(4), createdAt: new Date() },
+    { upsert: true, new: true }
+  );
+  return otp;
+};
+
+module.exports = { generateRandomNumber, checkOtpExpire, generateOtpAndStore };
