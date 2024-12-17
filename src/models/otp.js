@@ -25,6 +25,11 @@ const otpSchema = new mongoose.Schema(
         "email address length can not be greater than 50 characters",
       ],
     },
+    expiresAt: {
+      type: Date,
+      required: true,
+      default: () => new Date(Date.now() + 10 * 60 * 1000), // 10 minutes from now delete automatically
+    },
   },
   {
     timestamps: true,

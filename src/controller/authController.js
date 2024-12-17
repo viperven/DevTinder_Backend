@@ -1,4 +1,5 @@
 //user controller.js
+const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const OTP = require("../models/otp");
@@ -16,8 +17,9 @@ const {
 const Connection = require("../models/connection");
 const Conversation = require("../models/conversations");
 const Message = require("../models/message");
-const { sendSignUpMail, sendOTPMail } = require("../helper/emailService");
+const { sendSignUpMail, sendOTPMail, sendDeleteOTPMail } = require("../helper/emailService");
 
+//send otp for registration
 const sendOtp = async (req, res) => {
   try {
     const { emailID } = req.body;
@@ -30,12 +32,12 @@ const sendOtp = async (req, res) => {
     const isEmailIdExists = await User.findOne({ emailId: emailID });
 
     if (isEmailIdExists) {
-     return res.status(400).send({
+      return res.status(400).send({
         isSuccess: false,
         message: "email id already exists.",
       });
     }
-    
+
     const otp = await generateOtpAndStore(emailID);
     await sendOTPMail(emailID, otp?.otp);
     res.status(200).send({
@@ -282,16 +284,64 @@ const forgetPassword = async (req, res) => {
   }
 };
 
+const sendOtpForDeleteUser = async (req, res) => {
+  try {
+    const user = req.user;
+    const loggedInUser = new mongoose.Types.ObjectId(user._id);
+
+    const userDeatils = await User.findById(loggedInUser);
+    const otp = await generateOtpAndStore(userDeatils?.emailId);
+    console.log(userDeatils?.emailId);
+    
+    await sendDeleteOTPMail(userDeatils?.emailId, otp)
+    res.status(200).json({ isSuccess: true, message: "otp send sucessfully" })
+  }
+  catch (err) {
+    console.log(err?.message);
+    res.status(500).json({
+      isSuccess: false,
+      message: "Server error. Please try again later.",
+    });
+
+  }
+}
+
+//just take otp and match
 const deleteUser = async (req, res) => {
   try {
-    const userId = req.user._id; // Already validated in middleware
-    const user = await User.findById(userId); // Ensure it's a Mongoose document
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+    const { userOtp } = req.body;
 
     if (!user) {
       return res
         .status(400)
         .json({ isSuccess: false, message: "User not found!" });
     }
+
+    if (!userOtp) {
+      return res
+        .status(400)
+        .json({ isSuccess: false, message: "otp is mandatory!" });
+    }
+
+    const isUserOtpExists = await OTP.findOne({ emailId: user?.emailId });
+    const isOtpExpired = checkOtpExpire(isUserOtpExists?.updatedAt);
+
+    if (!isUserOtpExists || isOtpExpired) {
+      return res.status(401).json({
+        isSuccess: false,
+        message: "user otp not found or expired",
+      });
+    }
+
+    if (isUserOtpExists.otp !== userOtp) {
+      return res.status(401).json({
+        isSuccess: false,
+        message: "user otp mismatch ",
+      });
+    }
+
 
     // Manually trigger cascade deletions
     await Promise.all([
@@ -328,4 +378,4 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { signUp, login, logout, forgetPassword, deleteUser, sendOtp };
+module.exports = { signUp, login, logout, forgetPassword, deleteUser, sendOtp, sendOtpForDeleteUser };

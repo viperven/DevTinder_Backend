@@ -29,7 +29,7 @@ const sendSignUpMail = async (receiverMailId, receiverName = "user") => {
   }
 };
 
-const sendOTPMail = async (receiverMailId, otp) => {  
+const sendOTPMail = async (receiverMailId, otp) => {
   const mailOptions = {
     from: process.env.email_user,
     to: receiverMailId,
@@ -44,4 +44,19 @@ const sendOTPMail = async (receiverMailId, otp) => {
   }
 };
 
-module.exports = { sendSignUpMail, sendOTPMail };
+const sendDeleteOTPMail = async (receiverMailId, otp) => {
+  const mailOptions = {
+    from: process.env.email_user,
+    to: receiverMailId,
+    subject: "Attention Your Account will be permanently deleted",
+    text: `Yout OTP is ${otp} and valid only for 10 minutes ... Dev Tinder`,
+  };
+  try {
+    const info = await transporter.sendMail(mailOptions); // No manual promise wrapping needed
+    return "Email sent: " + info.response;
+  } catch (error) {
+    throw new Error("Error occurred: " + error.message);
+  }
+};
+
+module.exports = { sendSignUpMail, sendOTPMail, sendDeleteOTPMail };
