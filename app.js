@@ -43,8 +43,8 @@ app.use("/message", require("./src/routes/messageRoute"));
 connectDB()
   .then(() => {
     console.log("Database connection established");
-    server.listen(4000, () => {
-      console.log("server working at 4000");
+    server.listen(5000, () => {
+      console.log("server working at 5000");
     });
   })
   .catch((err) => {

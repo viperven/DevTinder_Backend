@@ -27,6 +27,15 @@ const sendOtp = async (req, res) => {
         .status(400)
         .send({ isSuccess: false, message: "email id is required" });
     }
+    const isEmailIdExists = await User.findOne({ emailId: emailID });
+
+    if (isEmailIdExists) {
+     return res.status(400).send({
+        isSuccess: false,
+        message: "email id already exists.",
+      });
+    }
+    
     const otp = await generateOtpAndStore(emailID);
     await sendOTPMail(emailID, otp?.otp);
     res.status(200).send({

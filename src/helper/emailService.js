@@ -29,7 +29,7 @@ const sendSignUpMail = async (receiverMailId, receiverName = "user") => {
   }
 };
 
-const sendOTPMail = async (receiverMailId, otp) => {
+const sendOTPMail = async (receiverMailId, otp) => {  
   const mailOptions = {
     from: process.env.email_user,
     to: receiverMailId,
