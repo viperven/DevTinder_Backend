@@ -53,14 +53,23 @@ connectDB()
 
 // Socket.IO configuration
 io.on("connection", (socket) => {
-  console.log("socket", socket);
   console.log("A user connected:", socket.id);
 
-  // Listen for chat messages
+  // Join room
+  socket.on("joinRoom", (roomID) => {
+    socket.join(roomID);
+    console.log(`User ${socket.id} joined room: ${roomID}`);
+  });
+
+  // Listen for chat messages and emit only to the room
   socket.on("sendMessage", (message) => {
     console.log("Message received:", message);
-    // Broadcast message to all connected clients
-    io.emit("receiveMessage", message);
+    const roomID = message.conversationID;
+
+    if (roomID) {
+      // Emit message only to users in the same room
+      io.to(roomID).emit("receiveMessage", message);
+    }
   });
 
   // Handle disconnection
