@@ -63,7 +63,7 @@ io.on("connection", (socket) => {
 
   // Listen for chat messages and emit only to the room
   socket.on("sendMessage", (message) => {
-    console.log("Message received:", message);
+    // console.log("Message received:", message);
     const roomID = message.conversationID;
 
     if (roomID) {
