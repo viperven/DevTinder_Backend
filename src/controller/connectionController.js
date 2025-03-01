@@ -36,7 +36,7 @@ const send = async (req, res) => {
         { senderID: receiverIDMongodbId, receiverID: senderID },
       ],
     });
-
+    console.log(requestExists);
     if (requestExists.length > 0) {
       return res.status(401).json({
         isSuccess: false,
@@ -80,7 +80,7 @@ const review = async (req, res) => {
   try {
     const user = req.user;
     const { senderID, status } = req.params;
-
+    console.log(senderID, status);
     const receiverID = new mongoose.Types.ObjectId(user._id);
 
     const allowedStatus = ["accepted", "ignored"];
@@ -100,6 +100,7 @@ const review = async (req, res) => {
         "_id firstName lastName keySkills photoUrl summary gender"
       );
 
+    console.log(fetchConnectionRequest);
     if (!fetchConnectionRequest) {
       return res.status(401).json({
         isSuccess: false,
@@ -119,6 +120,8 @@ const review = async (req, res) => {
         "_id firstName lastName keySkills photoUrl summary gender"
       )
       .populate("receiverID", "_id firstName r");
+
+    console.log(changeConnectionStatus);
 
     res.status(200).json({
       isSuccess: true,

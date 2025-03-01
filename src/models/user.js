@@ -112,6 +112,7 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
 userSchema.index({ keySkills: 1 }); // Creates a multikey index for array field
 
 userSchema.pre("save", async function (next) {

@@ -17,7 +17,11 @@ const {
 const Connection = require("../models/connection");
 const Conversation = require("../models/conversations");
 const Message = require("../models/message");
-const { sendSignUpMail, sendOTPMail, sendDeleteOTPMail } = require("../helper/emailService");
+const {
+  sendSignUpMail,
+  sendOTPMail,
+  sendDeleteOTPMail,
+} = require("../helper/emailService");
 
 //send otp for registration
 const sendOtp = async (req, res) => {
@@ -292,19 +296,17 @@ const sendOtpForDeleteUser = async (req, res) => {
     const userDeatils = await User.findById(loggedInUser);
     const otp = await generateOtpAndStore(userDeatils?.emailId);
     console.log(userDeatils?.emailId);
-    
-    await sendDeleteOTPMail(userDeatils?.emailId, otp)
-    res.status(200).json({ isSuccess: true, message: "otp send sucessfully" })
-  }
-  catch (err) {
+
+    await sendDeleteOTPMail(userDeatils?.emailId, otp);
+    res.status(200).json({ isSuccess: true, message: "otp send sucessfully" });
+  } catch (err) {
     console.log(err?.message);
     res.status(500).json({
       isSuccess: false,
       message: "Server error. Please try again later.",
     });
-
   }
-}
+};
 
 //just take otp and match
 const deleteUser = async (req, res) => {
@@ -342,7 +344,6 @@ const deleteUser = async (req, res) => {
       });
     }
 
-
     // Manually trigger cascade deletions
     await Promise.all([
       Connection.deleteMany({
@@ -378,4 +379,12 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { signUp, login, logout, forgetPassword, deleteUser, sendOtp, sendOtpForDeleteUser };
+module.exports = {
+  signUp,
+  login,
+  logout,
+  forgetPassword,
+  deleteUser,
+  sendOtp,
+  sendOtpForDeleteUser,
+};

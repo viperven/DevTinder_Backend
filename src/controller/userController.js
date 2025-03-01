@@ -7,7 +7,7 @@ const received = async (req, res) => {
   try {
     const user = req.user;
     const receiverID = new mongoose.Types.ObjectId(user._id);
-
+    console.log(receiverID);
     const findAllConnections = await Connection.find({
       receiverID: receiverID,
       status: "interested",
@@ -17,6 +17,8 @@ const received = async (req, res) => {
         "senderID",
         "_id firstName lastName keySkills photoUrl summary gender"
       );
+
+    console.log(findAllConnections);
 
     res.status(200).json({
       isSuccess: true,
@@ -54,7 +56,10 @@ const connections = async (req, res) => {
       ],
     })
       .select("status createdAt updatedAt receiverID") // Limit fields in `connectionRequest`
-      .populate("senderID", "_id firstName lastName keySkills photoUrl summary gender")
+      .populate(
+        "senderID",
+        "_id firstName lastName keySkills photoUrl summary gender"
+      )
       .populate(
         "receiverID",
         "_id firstName lastName keySkills photoUrl summary gender"
@@ -158,7 +163,10 @@ const ignore = async (req, res) => {
         "senderID",
         "_id firstName lastName keySkills photoUrl summary gender"
       )
-      .populate("receiverID", "_id firstName lastName keySkills photoUrl summary gender")
+      .populate(
+        "receiverID",
+        "_id firstName lastName keySkills photoUrl summary gender"
+      )
       .lean();
 
     res.status(200).json({

@@ -53,6 +53,7 @@ connectDB()
 
 // Socket.IO configuration
 io.on("connection", (socket) => {
+  console.log("socket", socket);
   console.log("A user connected:", socket.id);
 
   // Listen for chat messages
@@ -71,4 +72,3 @@ io.on("connection", (socket) => {
 app.get("/", async (req, res) => {
   res.status(200).send("ok");
 });
-
