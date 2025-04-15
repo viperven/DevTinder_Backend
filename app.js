@@ -21,6 +21,14 @@ const io = new Server(server, {
   },
 });
 app.set("io", io);
+app.use(
+  "/payment/razorpay-webhook",
+  express.json({
+    verify: (req, res, buf) => {
+      req.rawBody = buf;
+    },
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 app.use(
@@ -38,6 +46,7 @@ app.use("/profile", require("./src/routes/profileRoutes"));
 app.use("/request", require("./src/routes/connectionRoutes"));
 app.use("/user", require("./src/routes/userRotutes"));
 app.use("/message", require("./src/routes/messageRoute"));
+app.use("/payment", require("./src/routes/paymentRoutes"));
 
 //first connect to db then start listening to api calls
 connectDB()
@@ -80,4 +89,8 @@ io.on("connection", (socket) => {
 
 app.get("/", async (req, res) => {
   res.status(200).send("ok");
+});
+
+app.get("/health", async (req, res) => {
+  res.status(200).send("working fine 🔥🔥");
 });
