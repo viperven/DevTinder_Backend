@@ -107,6 +107,17 @@ const userSchema = new mongoose.Schema(
         message: "Invalid URL",
       },
     },
+
+    plan: {
+      type: String,
+      enum: ["free", "premium", "gold"],
+      default: "free",
+      required: true,
+    },
+
+    planExpiresAt: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
